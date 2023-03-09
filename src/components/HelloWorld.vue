@@ -1,54 +1,42 @@
-<script setup lang="ts">
-import { ref ,reactive} from 'vue'
-import "../mock/index.js";
-import {findAll} from "../api/mockApi/mockApi";
-
-defineProps<{ msg: string }>()
-
-//页面数据请求
-let tableData = reactive([]);
-const getList = () =>{
-  findAll()
-  .then((res: { code: string; data: never[]; }) => {
-    if (res.code === "0"){ 
-        tableData.push.apply(tableData, res.data);
-      }
-    })
-    .catch(function (error: any) {
-      console.log(error);
-    });
-}
-getList()
-const count = ref(0)
-</script>
-
 <template>
-  <h1>{{ msg }}</h1>
-
-  <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test HMR
-    </p>
+  <div>
+    <p>姓名是:{{ name }}</p>
+    <p>年龄是:{{ age }}</p>
+    <p>数组是:{{listfilter}}</p>
+    <button @click="age++">年龄+1</button>
+     <button @click="changeList">改变数组</button>
+     <Father></Father>
   </div>
 
-  <p>
-    Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
-  </p>
-  <p>
-    Install
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-    in your IDE for a better DX
-  </p>
-  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
 </template>
 
-<style scoped>
-.read-the-docs {
-  color: #888;
+<script>
+// 1. 从vue框架中引入reactive函数
+import {reactive,toRefs,ref,computed} from 'vue'
+import Father from './Father.vue'
+export default {
+  setup() {
+    // 2. 在setup中调用函数并将数据对象引入
+    const name = ref('小明')
+    const user = reactive({
+      name: 'zs',
+      age: 18
+    })
+    const list = ref([1,2,3,4,5])
+    const listfilter = computed(()=>{
+      return list.value.filter(item=>item>3)
+    })
+    function changeList(){
+      list.value.push(6,8,9)
+    }
+    // 3.在setup函数中把reactive函数调用完毕之后的返回值以对象的形式返回出去
+    return {
+      ...toRefs(user),
+      name,
+      listfilter,
+      list,
+      changeList
+    }
+  }
 }
-</style>
+</script>
